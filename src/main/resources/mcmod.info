@@ -1,0 +1,16 @@
+[
+{
+  "modid": "onechunkchallenge",
+  "name": "One Chunk Challenge",
+  "description": "Stops players from breaking blocks outside of world spawn chunks",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["PbJBOSS"],
+  "credits": "enderlord99",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
