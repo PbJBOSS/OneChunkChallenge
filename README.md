@@ -1,0 +1,1 @@
+A mod for minecraft that only lets players place blocks in their spawn chunks.
