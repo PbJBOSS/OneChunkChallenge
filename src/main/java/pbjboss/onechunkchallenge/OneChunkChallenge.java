@@ -8,8 +8,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -63,12 +61,13 @@ public class OneChunkChallenge
         if (player.worldObj.isRemote)
             return;
 
-        if (!isInsideSpawnChunks(player.playerLocation.posX, player.playerLocation.posZ, player.worldObj))
-        {
-            FMLLog.warning("Invalid spawn! Moving player");
-            ChunkCoordinates spawnCoords = player.worldObj.getSpawnPoint();
-            ((EntityPlayerMP) player).playerNetServerHandler.setPlayerLocation(spawnCoords.posX + 0.5, spawnCoords.posY, spawnCoords.posZ + 0.5, event.player.cameraYaw, ((EntityPlayerMP) event.player).cameraPitch);
-        }
+        //TODO
+//        if (!isInsideSpawnChunks(player.playerLocation.posX, player.playerLocation.posZ, player.worldObj))
+//        {
+//            FMLLog.warning("Invalid spawn! Moving player");
+//            ChunkCoordinates spawnCoords = player.worldObj.getSpawnPoint();
+//            ((EntityPlayerMP) player).playerNetServerHandler.setPlayerLocation(spawnCoords.posX + 0.5, spawnCoords.posY, spawnCoords.posZ + 0.5, event.player.cameraYaw, ((EntityPlayerMP) event.player).cameraPitch);
+//        }
     }
 
     @SubscribeEvent
