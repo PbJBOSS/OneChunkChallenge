@@ -8,11 +8,13 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.WorldEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,29 +47,47 @@ public class OneChunkChallenge
     }
 
     @SubscribeEvent
-    public void worldLoadEvent(WorldEvent.Load event)
-    {
-        if (event.world.isRemote || !isWhitelistedWorld(event.world))
-            return;
-
-        int spawnChunkX = getChunkForPos(event.world.getSpawnPoint().posX);
-        int spawnChunkZ = getChunkForPos(event.world.getSpawnPoint().posZ);
-    }
-
-    @SubscribeEvent
     public void playerRespawnEvent(PlayerEvent.PlayerRespawnEvent event)
     {
         EntityPlayer player = event.player;
         if (player.worldObj.isRemote)
             return;
 
-        //TODO
-//        if (!isInsideSpawnChunks(player.playerLocation.posX, player.playerLocation.posZ, player.worldObj))
-//        {
-//            FMLLog.warning("Invalid spawn! Moving player");
-//            ChunkCoordinates spawnCoords = player.worldObj.getSpawnPoint();
-//            ((EntityPlayerMP) player).playerNetServerHandler.setPlayerLocation(spawnCoords.posX + 0.5, spawnCoords.posY, spawnCoords.posZ + 0.5, event.player.cameraYaw, ((EntityPlayerMP) event.player).cameraPitch);
-//        }
+        World world = player.worldObj;
+
+        ChunkCoordinates spawnCoords = world.getSpawnPoint();
+        int spawnChunkX = getChunkForPos(spawnCoords.posX);
+        int spawnChunkZ = getChunkForPos(spawnCoords.posZ);
+
+        int x = (spawnChunkX * 16) + 7, maxX = x + 8;
+        int y = spawnCoords.posY;
+        int z = (spawnChunkZ * 16) + 7, maxZ = z + 8;
+
+        if (checkCoordsForSpawn(x, y, z, world))
+            ((EntityPlayerMP) player).playerNetServerHandler.setPlayerLocation(x + .5, y + 1, z + .5, player.cameraYaw, ((EntityPlayerMP) player).cameraPitch);
+        else
+        {
+            for (x -= 7;  x < maxX; x++)
+                for (z -= 7; z < maxZ; z++)
+                {
+                    if (checkCoordsForSpawn(x, y, z, world))
+                    {
+                        ((EntityPlayerMP) player).playerNetServerHandler.setPlayerLocation(x + .5, y + 1, z + .5, player.cameraYaw, ((EntityPlayerMP) player).cameraPitch);
+                        return;
+                    }
+                }
+        }
+    }
+
+    private boolean checkCoordsForSpawn(int x, int y, int z, World world)
+    {
+        if (world.getBlock(x, y + 1, z).equals(Blocks.air) && world.getBlock(x, y + 2, z).equals(Blocks.air)) {
+            if (world.getBlock(x, y, z).equals(Blocks.air)) {
+                world.setBlock(x, y, z, Blocks.dirt);
+                return true;
+            }
+        }
+        return false;
     }
 
     @SubscribeEvent
@@ -101,9 +121,6 @@ public class OneChunkChallenge
         int spawnChunkZ = getChunkForPos(world.getSpawnPoint().posZ);
         int blockChunkX = getChunkForPos(x);
         int blockChunkZ = getChunkForPos(z);
-
-        FMLLog.info(String.format("sx: %s, sz: %s, x: %s, z: %s", spawnChunkX, spawnChunkZ, blockChunkX, blockChunkZ));
-
         return spawnChunkX == blockChunkX && spawnChunkZ == blockChunkZ;
     }
 
